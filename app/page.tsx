@@ -3,11 +3,11 @@ import React from 'react';
 export default function Home() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans leading-relaxed">
-      {/* メインヘッダー */}
-      <header className="py-16 px-6 text-center bg-white border-b border-slate-200">
-        <h1 className="text-4xl font-bold tracking-tight mb-4">Next Child Project</h1>
-        <p className="text-xl text-slate-600">「責任共有社会」の実現へ。</p>
-        <p className="text-md text-slate-500 mt-2">親が疲れない子育てを、テクノロジーとコミュニティで支えます。</p>
+      {/* メインヘッダー（フッターと同じ濃い色に変更） */}
+      <header className="py-16 px-6 text-center bg-slate-900 border-b border-slate-700 shadow-lg">
+        <h1 className="text-4xl font-bold tracking-tight mb-4 text-white">Next Child Project</h1>
+        <p className="text-xl text-slate-300">「責任共有社会」の実現へ。</p>
+        <p className="text-md text-slate-400 mt-2">親が疲れない子育てを、テクノロジーとコミュニティで支えます。</p>
       </header>
 
       <main className="max-w-6xl mx-auto flex flex-col md:flex-row gap-12 py-12 px-6">
@@ -17,7 +17,7 @@ export default function Home() {
           <h2 className="text-lg font-bold border-b-2 border-slate-900 mb-6 pb-2">活動ログ</h2>
           
           {/* 最新の活動 */}
-          <article className="mb-8 p-4 bg-white rounded-lg shadow-sm border border-slate-100">
+          <article className="mb-8 p-4 bg-white rounded-lg shadow-sm border border-slate-100 transition-hover hover:shadow-md">
             <time className="text-sm text-blue-600 font-semibold">2026.02.28</time>
             <h3 className="text-md font-bold mt-1 mb-2 leading-snug">
               <a href="#phase1-report" className="hover:text-blue-600 transition-colors">
@@ -64,7 +64,7 @@ export default function Home() {
 
             <blockquote className="border-l-4 border-amber-400 bg-amber-50 p-4 my-6 italic text-sm text-slate-700">
               <strong>現場の反省：ノイズ誤爆の発生</strong><br />
-              「卓球」「キーボード即売会」など、隣接ブースの音声を拾い上げ、AIが自身の質問と誤認して回答を続ける事象が発生。環境音への耐性がPhase 2への最優先課題です。
+              展示会場特有の騒音により、AIが自身の質問と誤認して回答を続ける事象が発生。環境音への耐性がPhase 2への最優先課題です。
             </blockquote>
 
             <h3 className="text-xl font-bold text-slate-800 mt-6">3. メッセージを送信する</h3>
