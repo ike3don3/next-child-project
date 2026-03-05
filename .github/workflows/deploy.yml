@@ -28,7 +28,20 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          source: "out/"
-          target: "/var/www/next-child"
-          strip_components: 1
-          
+          # 修正ポイント：プロジェクト全体を送る設定に変更
+          source: ".,!node_modules"
+          target: "~/next-child-project"
+          strip_components: 0
+
+      - name: SSH Remote Commands
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          # 転送後に自動でアプリを再起動させるコマンドを追加
+          script: |
+            cd ~/next-child-project
+            npm install --production
+            pm2 restart next-child || pm2 start npm --name "next-child" -- start
