@@ -7,8 +7,7 @@ import path from 'path';
 async function openDb() {
   return open({
     // サーバー上の絶対パスを指定
-    filename: '/var/www/next-child/data/messages.db',
-    driver: sqlite3.Database,
+    filename: path.join(process.cwd(), 'data', 'messages.db'),    driver: sqlite3.Database,
   });
 }
 
