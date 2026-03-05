@@ -6,17 +6,16 @@ export default function Home() {
   const [content, setContent] = useState('');
   const [messages, setMessages] = useState<any[]>([]);
 
-  // 過去の履歴から特定した3つの活動ログデータ
   const activityLogs = [
     {
       date: '2026.03.01',
       title: '【活動報告】会話型AI展示実証実験（Phase 1）の結果報告',
-      summary: '育児における「感情労働」の分散を検証し、安全・倫理設計への関心が高いこと、ノイズ耐性の課題が判明しました。'
+      summary: '育児における「感情労働」の分散を検証。安全・倫理設計への関心の高さと課題を特定。'
     },
     {
       date: '2026.02.28',
       title: '【実証実験報告】会話型AI「メイ」による育児負担分散の試み：Phase 1',
-      summary: '新宿コクーンタワーでの初の実証実験。ノイズ混入による「安全説明」誤爆から得られた改善点を含む。'
+      summary: '新宿コクーンタワーでの実証実験。AIによる感情労働分散の可能性を検証。'
     },
     {
       date: '2026.02.16',
@@ -56,18 +55,15 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans leading-relaxed">
-      {/* ヘッダー */}
-      <header className="py-12 px-6 text-center bg-slate-900 border-b border-slate-700 shadow-lg">
-        <h1 className="text-4xl font-bold tracking-tight mb-4 text-white">Next Child Project</h1>
+      {/* ヘッダー：プロジェクト名のみ */}
+      <header className="py-16 px-6 text-center bg-slate-900 border-b border-slate-700 shadow-lg">
+        <h1 className="text-5xl font-extrabold tracking-tight mb-4 text-white italic">Next Child Project</h1>
         <p className="text-xl text-slate-300">「責任共有社会」の実現へ。</p>
-        <p className="text-md text-slate-400 mt-2">東京通信大学 情報マネジメント学部 6期生 川上 武蔵</p>
       </header>
 
-      {/* 3カラム/2カラムレイアウトへの調整 */}
       <main className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 py-12 px-6">
-        
-        {/* 左側：活動ログ（3つ全て表示） */}
-        <aside className="lg:w-1/4 space-y-6 order-2 lg:order-1">
+        {/* 左側：活動ログリスト */}
+        <aside className="lg:w-1/4 space-y-6">
           <h2 className="text-lg font-bold border-b-2 border-slate-900 pb-2 flex items-center">
             <span className="mr-2">📁</span>活動ログ
           </h2>
@@ -80,75 +76,51 @@ export default function Home() {
           ))}
         </aside>
 
-        {/* 中央・右：詳細報告書 ＆ 掲示板 */}
-        <section className="lg:w-3/4 space-y-12 order-1 lg:order-2">
-          
-          {/* 最新の活動内容（1000字程度のメイン記事エリア） */}
+        {/* 右側：コンテンツ ＆ 掲示板 */}
+        <section className="lg:w-3/4 space-y-12">
+          {/* 最新の活動詳細 */}
           <article className="bg-white p-8 md:p-12 rounded-xl shadow-sm border border-slate-100">
-            <div className="mb-6">
-              <time className="text-blue-600 font-bold">{activityLogs[0].date}</time>
-              <h2 className="text-3xl font-extrabold mt-2 text-slate-900 leading-tight">
-                {activityLogs[0].title}
-              </h2>
-            </div>
-            
-            <div className="prose prose-slate max-w-none text-slate-700 space-y-4">
-              <p>
-                新宿コクーンタワーにて実施した会話型AI「メイ」の実証実験（Phase 1）の結果、育児における「感情労働」の分散というテーマに対して、来場者から多くの共感とフィードバックをいただきました。
-              </p>
-              <p>
-                本実験の目的は、AIが母親やケアギバーの精神的な負担をどのように肩代わりできるかを検証することにありました。アンケート結果からは、AIによる「安全・倫理設計」への関心が非常に高いことが判明しました。
-              </p>
-              <p>
-                一方で、会場特有の騒音問題により、AIが音声を正しく認識できず、説明プロセスにノイズが混入するという課題も明確になりました。今後はノイズキャンセル技術の向上や、文脈理解の深化を通じ、より実用的な「育児支援AI」としての完成度を高めていく必要があります。
-              </p>
-              {/* ここに詳細な内容をさらに追記できます */}
+            <time className="text-blue-600 font-bold">{activityLogs[0].date}</time>
+            <h2 className="text-3xl font-extrabold mt-2 mb-6 text-slate-900 leading-tight">
+              {activityLogs[0].title}
+            </h2>
+            <div className="prose prose-slate max-w-none text-slate-700 space-y-4 text-lg">
+              <p>新宿コクーンタワーにて実施した会話型AI「メイ」の実証実験（Phase 1）の結果、育児における「感情労働」の分散というテーマに対して、多くの共感とフィードバックをいただきました。</p>
             </div>
           </article>
 
-          {/* メッセージ掲示板（報告内容の下に配置） */}
+          {/* 掲示板 */}
           <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100">
-            <h2 className="text-2xl font-bold mb-6 flex items-center">
-              <span className="mr-2">💬</span>メッセージを送る・読む
-            </h2>
-            
+            <h2 className="text-2xl font-bold mb-6">💬 メッセージを送る・読む</h2>
             <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 mb-10">
               <div className="grid grid-cols-1 gap-4">
                 <input 
-                  type="text" 
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="お名前（匿名可）" 
-                  className="p-2 border border-slate-300 rounded focus:ring-2 focus:ring-slate-400 outline-none" 
+                  type="text" value={name} onChange={(e) => setName(e.target.value)}
+                  placeholder="お名前（匿名可）" className="p-2 border border-slate-300 rounded outline-none" 
                 />
                 <textarea 
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="メッセージ内容" 
-                  className="p-2 border border-slate-300 rounded h-28 focus:ring-2 focus:ring-slate-400 outline-none"
+                  value={content} onChange={(e) => setContent(e.target.value)}
+                  placeholder="メッセージ内容" className="p-2 border border-slate-300 rounded h-28 outline-none"
                 ></textarea>
-                <button 
-                  onClick={handleSubmit}
-                  className="bg-slate-900 text-white font-bold py-3 rounded hover:bg-slate-700 transition-all shadow-md"
-                >
+                <button onClick={handleSubmit} className="bg-slate-900 text-white font-bold py-3 rounded shadow-md hover:bg-slate-700 transition-all">
                   メッセージを公開する
                 </button>
               </div>
             </div>
 
             <div className="space-y-6">
-              <h3 className="font-bold border-l-4 border-slate-900 pl-3 mb-4">届いたメッセージ</h3>
+              <h3 className="font-bold border-l-4 border-slate-900 pl-3 mb-4 text-xl">届いたメッセージ</h3>
               <div className="max-h-[500px] overflow-y-auto pr-2">
                 {messages.length === 0 ? (
-                  <p className="text-slate-400 text-sm italic">まだメッセージはありません。</p>
+                  <p className="text-slate-400 italic">まだメッセージはありません。</p>
                 ) : (
                   messages.map((m) => (
-                    <div key={m.id} className="border-b border-slate-100 py-4 last:border-0">
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="font-bold text-slate-800">{m.name} さん</span>
+                    <div key={m.id} className="border-b border-slate-100 py-6 last:border-0">
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="font-bold text-slate-800 text-lg">{m.name} さん</span>
                         <span className="text-slate-400">{new Date(m.created_at).toLocaleDateString()}</span>
                       </div>
-                      <p className="text-slate-600 text-sm whitespace-pre-wrap leading-relaxed">{m.content}</p>
+                      <p className="text-slate-600 text-md whitespace-pre-wrap leading-relaxed">{m.content}</p>
                     </div>
                   ))
                 )}
@@ -158,16 +130,17 @@ export default function Home() {
         </section>
       </main>
 
+      {/* フッター：個人情報はここだけに集約 */}
       <footer className="bg-slate-900 text-slate-300 py-16 px-6 mt-12 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div>
-            <p className="font-bold text-white text-lg mb-4">Next Child Project</p>
-            <p className="text-sm">東京通信大学 情報マネジメント学部 6期生 川上 武蔵</p>
-            <p className="text-sm mt-1">氏名: {messages.some(m => m.name === '武蔵') ? 'Musashi Kawakami' : '武蔵'}</p>
+            <p className="font-bold text-white text-lg mb-2">Next Child Project</p>
+            <p className="text-sm text-slate-400">東京通信大学 情報マネジメント学部 6期生</p>
+            <p className="text-sm mt-1">川上 武蔵</p>
           </div>
-          <div className="md:text-right">
-            <p className="text-sm">Email: kawakami.musashi@smile2525.mobi</p>
-            <p className="text-xs mt-6 text-slate-500">&copy; 2026 Musashi Kawakami. All rights reserved.</p>
+          <div className="text-center md:text-right">
+            <p className="text-sm italic">kawakami.musashi@smile2525.mobi</p>
+            <p className="text-xs mt-4 text-slate-500">&copy; 2026 Next Child Project. All rights reserved.</p>
           </div>
         </div>
       </footer>
