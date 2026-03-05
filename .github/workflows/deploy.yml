@@ -31,3 +31,4 @@ jobs:
           source: "out/"
           target: "/var/www/next-child"
           strip_components: 1
+          
