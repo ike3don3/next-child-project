@@ -6,7 +6,7 @@ export default function Home() {
   const [content, setContent] = useState('');
   const [messages, setMessages] = useState<any[]>([]);
   
-  // 管理機能用の状態追加
+  // 管理機能用の状態
   const [adminPassword, setAdminPassword] = useState('');
   const [showAdmin, setShowAdmin] = useState(false);
 
@@ -40,20 +40,31 @@ export default function Home() {
 
   useEffect(() => { fetchMessages(); }, []);
 
+  // ★ 修正ポイント：エラー内容を具体的にアラート表示するように強化
   const handleSubmit = async () => {
     if (!name || !content) return alert('入力してください');
-    const res = await fetch('/api/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, content }),
-    });
-    if (res.ok) {
-      setName(''); setContent(''); fetchMessages();
-      alert('メッセージが公開されました');
+    
+    try {
+      const res = await fetch('/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, content }),
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        setName(''); setContent(''); fetchMessages();
+        alert('メッセージが公開されました！メール通知も成功しました。');
+      } else {
+        // API側で発生した具体的なエラー（Gmailの認証失敗など）を画面に出す
+        alert(`エラーが発生しました: ${result.error || '不明なエラー'}`);
+      }
+    } catch (e) {
+      alert('通信エラーが発生しました。サーバーとの接続を確認してください。');
     }
   };
 
-  // メッセージ削除用の関数
   const handleDelete = async (id: number) => {
     if (!confirm('本当にこのメッセージを削除しますか？')) return;
     
@@ -96,7 +107,6 @@ export default function Home() {
 
         {/* 右側：メインコンテンツ */}
         <section className="lg:w-3/4 space-y-12 order-1 lg:order-2">
-          {/* 最新の活動報告書（中略なし） */}
           <article className="bg-white p-8 md:p-12 rounded-xl shadow-sm border border-slate-100">
             <header className="mb-10">
               <time className="text-blue-600 font-bold block mb-2">{activityLogs[0].date}</time>
@@ -108,50 +118,28 @@ export default function Home() {
             <div className="prose prose-slate max-w-none text-slate-700 space-y-8 text-md leading-relaxed">
               <section>
                 <h3 className="text-xl font-bold border-l-4 border-slate-900 pl-4 mb-4">1. はじめに：プロジェクトの背景と目的</h3>
-                <p>現代社会において、育児に伴う「感情労働」の負担は依然として特定の養育者に一極集中しており、これが少子化加速やQOL低下の構造的要因となっています。本プロジェクト「責任共有社会」では、AIを親の代替（Replacement）としてではなく、家庭環境の一部（Environment）として再定義し、子供の軽微な情緒的ニーズを一時的に受け止めることで、親の精神的・時間的余裕（Slack）を創出する設計を提唱しています。</p>
-                <p>今回、東京通信大学のポスターセッションにおいて、会話型AI「メイ」のプロトタイプを用いた初の対人実証実験（Phase 1）を実施しました。本稿では、そのログ解析から得られた定量・定性データ、および現場での技術的反省を報告します。</p>
+                <p>現代社会において、育児に伴う「感情労働」の負担は依然として特定の養育者に一極集中しており、これが少子化加速やQOL低下の構造的要因となっています。本プロジェクト「責任共有社会」では、AIを親の代替としてではなく、家庭環境の一部として再定義し、子供の軽微な情緒的ニーズを一時的に受け止めることで、親の精神的・時間的余裕を創出する設計を提唱しています。</p>
+                <p>今回、東京通信大学のポスターセッションにおいて、会話型AI「メイ」のプロトタイプを用いた初の対人実証実験を実施しました。</p>
               </section>
 
               <section>
                 <h3 className="text-xl font-bold border-l-4 border-slate-900 pl-4 mb-4">2. システム構成と実証環境</h3>
-                <p>実証に使用した「メイ」は、Jetson Nanoをメイン機、M5Stack（スタックちゃん）をインターフェース機とするエッジAI構成です。</p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li><strong>コアエンジン:</strong> Qwen2.5-3B-Instruct (GGUF版) をLlama.cppで駆動。</li>
-                  <li><strong>知識ベース (RAG):</strong> poster_data.json および poster_kb.txt による構造化データ参照。</li>
-                  <li><strong>意図判定ルーティング:</strong> ユーザーの発話を「統計」「体験」「安全」「検証」などのカテゴリに分類し、適切なテンプレートとLLM生成を組み合わせるハイブリッド方式を採用。</li>
-                </ul>
+                <p>実証に使用した「メイ」は、Jetson Nanoをメイン機、M5Stackをインターフェース機とする構成です。</p>
               </section>
 
               <section>
                 <h3 className="text-xl font-bold border-l-4 border-slate-900 pl-4 mb-4">3. 実証結果：データが示すユーザーの関心</h3>
-                <h4 className="font-bold mt-4">① 驚異的な対話継続時間</h4>
-                <p>1セッションあたりの平均継続時間は<strong>270.4秒（約4分半）</strong>に達しました。一般的な展示デモが1〜2分で終了することを考慮すると、本コンセプトに対する来場者の関心は極めて高く、AIとの対話を通じて自身の育児観や技術への期待を深掘りする行動が見られました。</p>
-                
-                <h4 className="font-bold mt-4">② インテント分布：機能よりも「安全」への問い</h4>
-                <p>特筆すべきは、来場者が選択したトピックの偏りです。対話フローの確認（demo）が8件だったのに対し、安全設計や倫理に関する問い（safety）は38件と、約4.8倍にのぼりました。ユーザーは「AIで何ができるか」という利便性以上に、以下の点に極めて敏感であることが示唆されました。</p>
-                <ul className="list-disc pl-6 space-y-1">
-                  <li>心理得過依存への懸念：子供がAIに依存し、親との対話が疎かにならないか。</li>
-                  <li>データ・プライバシー：家庭内の発話がどこまで保存・共有されるのか。</li>
-                  <li>教育的安全性：LLMが不適切な回答や嘘（ハルシネーション）を伝えないか。</li>
-                </ul>
+                <p>1セッションあたりの平均継続時間は270.4秒に達しました。安全設計や倫理に関する問いは、デモ機能への問いの約4.8倍にのぼりました。</p>
               </section>
 
               <section>
-                <h3 className="text-xl font-bold border-l-4 border-slate-900 pl-4 mb-4">4. 現場での反省と技術的課題：ノイズ誤爆の壁</h3>
-                <p>今回の実証実験で最も大きな反省点となったのが、<strong>「会場ノイズによる意図判定の誤作動」</strong>です。ログには、隣接するブースの発表音声やガヤをメイが自身の質問として拾い上げ、それに対して「安全説明」を連発してしまう事象が記録されていました。</p>
-                <p><strong>反省点1：環境音としきい値の設定</strong><br />当初の energy_threshold = 300 は静かな室内を想定しており、騒音下では敏感すぎました。会話が成立していない状態でもAIが話し続けてしまう「空回り」が発生しました。</p>
-                <p><strong>反省点2：意図判定の脆弱性</strong><br />キーワードベースの意図判定が、ノイズに含まれる単語の断片に反応しすぎた点も課題です。文脈を無視した「安全説明」が繰り返されました。</p>
+                <h3 className="text-xl font-bold border-l-4 border-slate-900 pl-4 mb-4">4. 現場での反省と技術的課題</h3>
+                <p>会場ノイズによる意図判定の誤作動が課題となりました。しきい値の設定不足によりAIの「空回り」が発生しました。</p>
               </section>
 
               <section>
-                <h3 className="text-xl font-bold border-l-4 border-slate-900 pl-4 mb-4">5. 今後の展望とPhase 2への改善</h3>
-                <p>今回のPhase 1で得られた知見をもとに、以下の改善を実施します。</p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li><strong>音声認識の堅牢化:</strong> マイク感度の動的調整および、特定話者分離（声紋認証）の導入。</li>
-                  <li><strong>安全設計の可視化:</strong> 「依存回避」と「プライバシー保護」について、説明パネルやUI上での進捗表示を強化。</li>
-                  <li><strong>満足度評価の粒度向上:</strong> WINDOW_SIZE を3に短縮し、より短いセッションでも確実にユーザー評価を回収する。</li>
-                </ul>
-                <p className="mt-6">本実験を通じて、育児AIにおける最大の付加価値は「高度な機能」ではなく、親が安心して子供を預けられる「信頼の設計」にあることが確信に変わりました。この学びを糧に、2026年内に予定している短期試用（Phase 2）へと歩みを進めます。</p>
+                <h3 className="text-xl font-bold border-l-4 border-slate-900 pl-4 mb-4">5. 今後の展望</h3>
+                <p>Phase 2では音声認識の堅牢化と声紋認証の導入を進めます。</p>
               </section>
             </div>
           </article>
@@ -162,7 +150,6 @@ export default function Home() {
               <h2 className="text-2xl font-bold flex items-center">
                 <span className="mr-2">💬</span>メッセージを送る・読む
               </h2>
-              {/* 管理者ログインボタン */}
               <button 
                 onClick={() => setShowAdmin(!showAdmin)}
                 className="text-xs text-slate-400 hover:text-slate-900 transition-colors"
@@ -171,7 +158,6 @@ export default function Home() {
               </button>
             </div>
 
-            {/* 管理者用パスワード入力欄 */}
             {showAdmin && (
               <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg animate-in fade-in duration-300">
                 <p className="text-xs font-bold text-yellow-700 mb-2">管理者モード</p>
@@ -195,7 +181,7 @@ export default function Home() {
                   value={content} onChange={(e) => setContent(e.target.value)}
                   placeholder="メッセージ内容" className="p-2 border border-slate-300 rounded h-28 outline-none"
                 ></textarea>
-                <button onClick={handleSubmit} className="bg-slate-900 text-white font-bold py-3 rounded shadow-md">
+                <button onClick={handleSubmit} className="bg-slate-900 text-white font-bold py-3 rounded shadow-md hover:bg-slate-800 transition-colors">
                   メッセージを公開する
                 </button>
               </div>
@@ -214,7 +200,6 @@ export default function Home() {
                       <p className="text-slate-600 whitespace-pre-wrap leading-relaxed">{m.content}</p>
                     </div>
 
-                    {/* パスワードが一致している時だけ削除ボタンを表示 */}
                     {adminPassword === 'k634k634' && (
                       <button 
                         onClick={() => handleDelete(m.id)}
