@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
+import nodemailer from 'nodemailer'; // 追加
+
 export const dynamic = 'force-dynamic';
+
 // データベースへの接続設定
 async function openDb() {
   return open({
-    // サーバー上の絶対パスを「文字列」として直接指定します
+    // サーバー上の絶対パスを直接指定
     filename: '/var/www/next-child/data/messages.db',
     driver: sqlite3.Database,
   });
@@ -38,6 +41,29 @@ export async function POST(request: Request) {
       'INSERT INTO messages (name, content) VALUES (?, ?)',
       [name, content]
     );
+
+    // --- メール通知処理の追加 ---
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'kawakami.musashi@smile2525.mobi', 
+        // ここにGoogleアカウントで発行した16桁の「アプリパスワード」を入力してください
+        pass: 'dncc ushn uplq thqb' 
+      },
+    });
+
+    const mailOptions = {
+      from: `"Next Child Project" <kawakami.musashi@smile2525.mobi>`,
+      to: 'kawakami.musashi@smile2525.mobi',
+      subject: `【新着メッセージ】${name} 様より投稿がありました`,
+      text: `掲示板に新しいメッセージが届きました。\n\nお名前: ${name}\n内容:\n${content}\n\nサイトを確認する: https://touconnect.jp`,
+    };
+
+    // メールの送信（非同期で実行し、失敗しても投稿自体は完了させる）
+    transporter.sendMail(mailOptions).catch(err => {
+      console.error('Email notification failed:', err);
+    });
+    // -------------------------
     
     return NextResponse.json({ message: '送信完了' });
   } catch (error) {
@@ -50,8 +76,7 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
   const { id, password } = await request.json();
 
-  // 管理者パスワードの照合（ここでは例として 'admin123' に設定）
-  // 実際には環境変数などで管理するのが安全です
+  // 管理者パスワードの照合
   if (password !== 'admin123') {
     return NextResponse.json({ error: '認証に失敗しました' }, { status: 401 });
   }
