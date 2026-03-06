@@ -45,7 +45,6 @@ export async function POST(request: Request) {
       service: 'gmail',
       auth: {
         user: 'kawakami.musashi@smile2525.mobi', 
-        // サーバーの .env.local から取得
         pass: process.env.GMAIL_APP_PASSWORD 
       },
     });
@@ -73,8 +72,8 @@ export async function DELETE(request: Request) {
   try {
     const { id, password } = await request.json();
 
-    // 修正ポイント：サーバー側の設定(ADMIN_PASSWORD)を優先し、未設定なら 'admin123' を使用
-    const correctPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    // サーバー側の設定(ADMIN_PASSWORD)を優先し、未設定なら 'k634k634' を使用
+    const correctPassword = process.env.ADMIN_PASSWORD || 'k634k634';
 
     if (password !== correctPassword) {
       return NextResponse.json({ error: '認証に失敗しました' }, { status: 401 });
