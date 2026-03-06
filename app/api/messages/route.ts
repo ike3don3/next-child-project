@@ -34,16 +34,18 @@ export async function POST(request: Request) {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'kawakami.musashi@smile2525.mobi', 
+        // ★ 変更箇所：アプリパスワードを発行したアカウントに変更
+        user: 'ike3don3@gmail.com', 
         pass: process.env.GMAIL_APP_PASSWORD 
       },
     });
 
-    // 重要：失敗を検知するために await を使い、エラーを投げられるようにします
     try {
       console.log('★ メール送信を試行中...');
       await transporter.sendMail({
-        from: `"Next Child Project" <kawakami.musashi@smile2525.mobi>`,
+        // ★ 変更箇所：認証用アドレスと一致させる
+        from: `"Next Child Project" <ike3don3@gmail.com>`,
+        // 通知先は武蔵さんのメインアドレスのままでOK
         to: 'kawakami.musashi@smile2525.mobi',
         subject: `【新着】${name}様より投稿`,
         text: `お名前: ${name}\n内容:\n${content}\n\nhttps://touconnect.jp`,
@@ -52,7 +54,6 @@ export async function POST(request: Request) {
     } catch (mailError: any) {
       console.error('★★★★★ メール送信失敗！ ★★★★★');
       console.error('詳細:', mailError.message);
-      // ここでエラーを投げることで、下の catch に飛ばします
       throw new Error(`メール送信エラー: ${mailError.message}`);
     }
     
