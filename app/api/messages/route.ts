@@ -45,3 +45,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: '保存に失敗しました' }, { status: 500 });
   }
 }
+
+// メッセージ削除用の処理
+export async function DELETE(request: Request) {
+  const { id, password } = await request.json();
+
+  // 管理者パスワードの照合（ここでは例として 'admin123' に設定）
+  // 実際には環境変数などで管理するのが安全です
+  if (password !== 'admin123') {
+    return NextResponse.json({ error: '認証に失敗しました' }, { status: 401 });
+  }
+
+  const db = await openDb();
+  await db.run('DELETE FROM messages WHERE id = ?', id);
+  
+  return NextResponse.json({ message: '削除しました' });
+}

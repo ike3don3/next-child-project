@@ -5,6 +5,10 @@ export default function Home() {
   const [name, setName] = useState('');
   const [content, setContent] = useState('');
   const [messages, setMessages] = useState<any[]>([]);
+  
+  // 管理機能用の状態追加
+  const [adminPassword, setAdminPassword] = useState('');
+  const [showAdmin, setShowAdmin] = useState(false);
 
   const activityLogs = [
     {
@@ -49,6 +53,24 @@ export default function Home() {
     }
   };
 
+  // メッセージ削除用の関数
+  const handleDelete = async (id: number) => {
+    if (!confirm('本当にこのメッセージを削除しますか？')) return;
+    
+    const res = await fetch('/api/messages', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, password: adminPassword }),
+    });
+
+    if (res.ok) {
+      fetchMessages();
+      alert('削除完了しました');
+    } else {
+      alert('削除に失敗しました（パスワードが違う可能性があります）');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans leading-relaxed">
       {/* ヘッダー */}
@@ -74,7 +96,7 @@ export default function Home() {
 
         {/* 右側：メインコンテンツ */}
         <section className="lg:w-3/4 space-y-12 order-1 lg:order-2">
-          {/* 最新の活動報告書 */}
+          {/* 最新の活動報告書（中略なし） */}
           <article className="bg-white p-8 md:p-12 rounded-xl shadow-sm border border-slate-100">
             <header className="mb-10">
               <time className="text-blue-600 font-bold block mb-2">{activityLogs[0].date}</time>
@@ -118,7 +140,7 @@ export default function Home() {
                 <h3 className="text-xl font-bold border-l-4 border-slate-900 pl-4 mb-4">4. 現場での反省と技術的課題：ノイズ誤爆の壁</h3>
                 <p>今回の実証実験で最も大きな反省点となったのが、<strong>「会場ノイズによる意図判定の誤作動」</strong>です。ログには、隣接するブースの発表音声やガヤをメイが自身の質問として拾い上げ、それに対して「安全説明」を連発してしまう事象が記録されていました。</p>
                 <p><strong>反省点1：環境音としきい値の設定</strong><br />当初の energy_threshold = 300 は静かな室内を想定しており、騒音下では敏感すぎました。会話が成立していない状態でもAIが話し続けてしまう「空回り」が発生しました。</p>
-                <p><strong>反省点2：インテント判定の脆弱性</strong><br />キーワードベースの意図判定が、ノイズに含まれる単語の断片に反応しすぎた点も課題です。文脈を無視した「安全説明」が繰り返されました。</p>
+                <p><strong>反省点2：意図判定の脆弱性</strong><br />キーワードベースの意図判定が、ノイズに含まれる単語の断片に反応しすぎた点も課題です。文脈を無視した「安全説明」が繰り返されました。</p>
               </section>
 
               <section>
@@ -136,9 +158,33 @@ export default function Home() {
 
           {/* 掲示板 */}
           <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100">
-            <h2 className="text-2xl font-bold mb-6 flex items-center">
-              <span className="mr-2">💬</span>メッセージを送る・読む
-            </h2>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold flex items-center">
+                <span className="mr-2">💬</span>メッセージを送る・読む
+              </h2>
+              {/* 管理者ログインボタン */}
+              <button 
+                onClick={() => setShowAdmin(!showAdmin)}
+                className="text-xs text-slate-400 hover:text-slate-900 transition-colors"
+              >
+                {showAdmin ? '管理を閉じる' : '管理者ログイン'}
+              </button>
+            </div>
+
+            {/* 管理者用パスワード入力欄 */}
+            {showAdmin && (
+              <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg animate-in fade-in duration-300">
+                <p className="text-xs font-bold text-yellow-700 mb-2">管理者モード</p>
+                <input 
+                  type="password" 
+                  placeholder="管理パスワードを入力" 
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  className="p-2 border border-slate-300 rounded text-sm w-full md:w-64 outline-none focus:ring-2 focus:ring-yellow-400"
+                />
+              </div>
+            )}
+
             <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 mb-10">
               <div className="grid grid-cols-1 gap-4">
                 <input 
@@ -159,12 +205,24 @@ export default function Home() {
               <h3 className="font-bold border-l-4 border-slate-900 pl-3 mb-4">届いたメッセージ</h3>
               <div className="max-h-[500px] overflow-y-auto pr-2">
                 {messages.map((m) => (
-                  <div key={m.id} className="border-b border-slate-100 py-4 last:border-0 text-sm">
-                    <div className="flex justify-between mb-1">
-                      <span className="font-bold text-slate-800">{m.name} さん</span>
-                      <span className="text-slate-400">{new Date(m.created_at).toLocaleDateString()}</span>
+                  <div key={m.id} className="border-b border-slate-100 py-4 last:border-0 text-sm flex justify-between items-start">
+                    <div className="flex-1">
+                      <div className="flex justify-between mb-1">
+                        <span className="font-bold text-slate-800">{m.name} さん</span>
+                        <span className="text-slate-400">{new Date(m.created_at).toLocaleDateString()}</span>
+                      </div>
+                      <p className="text-slate-600 whitespace-pre-wrap leading-relaxed">{m.content}</p>
                     </div>
-                    <p className="text-slate-600 whitespace-pre-wrap leading-relaxed">{m.content}</p>
+
+                    {/* パスワードが一致している時だけ削除ボタンを表示 */}
+                    {adminPassword === 'admin123' && (
+                      <button 
+                        onClick={() => handleDelete(m.id)}
+                        className="ml-4 px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors shadow-sm"
+                      >
+                        削除
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
