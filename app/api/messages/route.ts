@@ -48,7 +48,7 @@ export async function POST(request: Request) {
       auth: {
         user: 'kawakami.musashi@smile2525.mobi', 
         // ここにGoogleアカウントで発行した16桁の「アプリパスワード」を入力してください
-        pass: 'dncc ushn uplq thqb' 
+        pass: process.env.GMAIL_APP_PASSWORD 
       },
     });
 
