@@ -215,7 +215,7 @@ export default function Home() {
                     </div>
 
                     {/* パスワードが一致している時だけ削除ボタンを表示 */}
-                    {adminPassword === 'admin123' && (
+                    {adminPassword === 'k634k634' && (
                       <button 
                         onClick={() => handleDelete(m.id)}
                         className="ml-4 px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors shadow-sm"
