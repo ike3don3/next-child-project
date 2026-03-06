@@ -1,14 +1,13 @@
 import { NextResponse } from 'next/server';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
-import nodemailer from 'nodemailer'; // 追加
+import nodemailer from 'nodemailer';
 
 export const dynamic = 'force-dynamic';
 
 // データベースへの接続設定
 async function openDb() {
   return open({
-    // サーバー上の絶対パスを直接指定
     filename: '/var/www/next-child/data/messages.db',
     driver: sqlite3.Database,
   });
@@ -18,7 +17,6 @@ async function openDb() {
 export async function GET() {
   try {
     const db = await openDb();
-    // 最新の投稿が上にくるように取得
     const messages = await db.all('SELECT * FROM messages ORDER BY created_at DESC');
     return NextResponse.json(messages);
   } catch (error) {
@@ -42,12 +40,12 @@ export async function POST(request: Request) {
       [name, content]
     );
 
-    // --- メール通知処理の追加 ---
+    // メール通知処理
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: 'kawakami.musashi@smile2525.mobi', 
-        // ここにGoogleアカウントで発行した16桁の「アプリパスワード」を入力してください
+        // サーバーの .env.local から取得
         pass: process.env.GMAIL_APP_PASSWORD 
       },
     });
@@ -59,11 +57,9 @@ export async function POST(request: Request) {
       text: `掲示板に新しいメッセージが届きました。\n\nお名前: ${name}\n内容:\n${content}\n\nサイトを確認する: https://touconnect.jp`,
     };
 
-    // メールの送信（非同期で実行し、失敗しても投稿自体は完了させる）
     transporter.sendMail(mailOptions).catch(err => {
       console.error('Email notification failed:', err);
     });
-    // -------------------------
     
     return NextResponse.json({ message: '送信完了' });
   } catch (error) {
@@ -72,17 +68,24 @@ export async function POST(request: Request) {
   }
 }
 
-// メッセージ削除用の処理
+// メッセージ削除用の処理 (DELETE)
 export async function DELETE(request: Request) {
-  const { id, password } = await request.json();
+  try {
+    const { id, password } = await request.json();
 
-  // 管理者パスワードの照合
-  if (password !== 'admin123') {
-    return NextResponse.json({ error: '認証に失敗しました' }, { status: 401 });
+    // 修正ポイント：サーバー側の設定(ADMIN_PASSWORD)を優先し、未設定なら 'admin123' を使用
+    const correctPassword = process.env.ADMIN_PASSWORD || 'admin123';
+
+    if (password !== correctPassword) {
+      return NextResponse.json({ error: '認証に失敗しました' }, { status: 401 });
+    }
+
+    const db = await openDb();
+    await db.run('DELETE FROM messages WHERE id = ?', id);
+    
+    return NextResponse.json({ message: '削除しました' });
+  } catch (error) {
+    console.error('DELETE Error:', error);
+    return NextResponse.json({ error: '削除に失敗しました' }, { status: 500 });
   }
-
-  const db = await openDb();
-  await db.run('DELETE FROM messages WHERE id = ?', id);
-  
-  return NextResponse.json({ message: '削除しました' });
 }
